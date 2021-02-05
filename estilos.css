@@ -1,0 +1,9 @@
+
+@import "bulma/bulma.sass";
+
+
+.mapa{
+    width: 70vw;
+    height: 70vh;
+    margin-bottom: 8rem;
+}
