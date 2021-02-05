@@ -8,6 +8,10 @@ import "ol/ol.css"
 
 import Overlay from 'ol/Overlay';
 
+import VectorLayer from 'ol/layer/Vector';
+import VectorSource from 'ol/source/Vector';
+import GeoJSON from 'ol/format/GeoJSON';
+
 
 let overlay_tooltip = new Overlay({
     id: "tooltip",
@@ -22,6 +26,14 @@ overlay_tooltip.setPosition(undefined)
 
 
 
+//creando un layer desde un geojson
+var zonasMetro_layer = new VectorLayer({
+  source: new VectorSource({
+    url:  "https://geo.crip.conacyt.mx/geoserver/a_interinstitucional_zonas_metropolitanas_2015/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=a_interinstitucional_zonas_metropolitanas_2015%3Aa_interinstitucional_zonas_metropolitanas_2015&maxFeatures=50&outputFormat=application%2Fjson",
+    format: new GeoJSON()
+  })
+})
+
 
 
 
@@ -35,7 +47,7 @@ var map = new Map({
   layers: [
     new TileLayer({
         source: new OSM()
-    })
+    }),zonasMetro_layer
   ],
   target: 'mapa1',
   overlays:[
@@ -44,10 +56,24 @@ var map = new Map({
 });
 
 map.on("click",(e)=>{
+  var pixel = map.getEventPixel(e.originalEvent);
+  var hit = map.hasFeatureAtPixel(pixel);
+
+  if (hit) {
+    var f_l = map.forEachFeatureAtPixel(pixel, function (feature, layer) {
+        return [feature, layer];
+    });
+
     let tooltip_overlay = map.getOverlayById("tooltip")
-    tooltip_overlay.getElement().querySelector("div.content").innerHTML = `Diste click en:  ${e.coordinate}`
+    tooltip_overlay.getElement().querySelector("div.content").innerHTML = `Diste click en:  ${f_l[0].getProperties()["nom_zm"]}`
     tooltip_overlay.setPosition(e.coordinate)
     console.log(e.coordinate)
 
+
+  }
+
+    /*
+    
+    */
 })
 
